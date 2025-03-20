@@ -1,8 +1,8 @@
 {
-  "name": "quasar-project",
+  "name": "journal-app-quasar",
   "version": "0.0.1",
-  "description": "A Quasar Project",
-  "productName": "Quasar App",
+  "description": "Journal App with Quasar",
+  "productName": "Journal App",
   "author": "Mohamed Koujil <mohamed.koujil.7e7@itb.cat>",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
     "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
     "test": "echo \"No test specified\" && exit 0",
     "dev": "quasar dev",
+    "dev:android": "quasar dev -m capacitor -T android",
     "build": "quasar build"
   },
   "dependencies": {
