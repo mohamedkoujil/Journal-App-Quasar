@@ -1,25 +1,36 @@
+import { useCheckAuth } from "../composables/useCheckAuth";
+
 const routes = [
   {
     path: "/",
+    redirect: async () => {
+      const status = await useCheckAuth();
+      return status === "authenticated" ? "/journal" : "/auth/login";
+    },
+  },
+  {
+    path: "/journal",
     component: () => import("layouts/MainLayout.vue"),
-    children: [{ path: "", component: () => import("pages/IndexPage.vue") }],
+    meta: { requiresAuth: true },
+    children: [{ path: "", component: () => import("pages/JournalPage.vue") }],
   },
   {
     path: "/auth",
     component: () => import("layouts/AuthLayout.vue"),
+    meta: { requiresGuest: true },
     children: [
       {
         path: "login",
+        name: "Login",
         component: () => import("pages/auth/LoginPage.vue"),
       },
       {
         path: "register",
+        name: "Register",
         component: () => import("pages/auth/RegisterPage.vue"),
       },
     ],
   },
-  // Always leave this as last one,
-  // but you can also remove it
   {
     path: "/:catchAll(.*)*",
     component: () => import("pages/ErrorNotFound.vue"),
