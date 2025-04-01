@@ -1,8 +1,9 @@
-import { computed, reactive, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 
 export const useForm = (initialForm = {}, formValidations = {}) => {
   const formState = reactive({ ...initialForm });
   const formValidation = reactive({});
+  const formSubmitted = ref(false);
 
   watch(
     formState,
@@ -24,6 +25,7 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
   });
 
   const onInputChange = (name, value) => {
+    console.log(value);
     formState[name] = value;
   };
 
@@ -40,6 +42,10 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     }
   };
 
+  const submitForm = () => {
+    formSubmitted.value = true;
+  };
+
   return {
     ...formState,
     formState,
@@ -47,5 +53,6 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     onResetForm,
     isFormValid,
     ...formValidation,
+    submitForm,
   };
 };
