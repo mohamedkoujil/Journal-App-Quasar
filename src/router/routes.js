@@ -4,15 +4,14 @@ const routes = [
     component: () => import("src/pages/auth/CheckAuthPage.vue"),
   },
   {
-    path: "/journal",
-    name: "Journal",
+    path: "/app",
+    name: "App",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {
-        path: ":itemId?",
-        name: "JournalPage",
-        props: true,
-        component: () => import("pages/Journal/JournalPage.vue"),
+        path: "journal",
+        name: "Journal",
+        component: () => import("pages/Journal/pages/JournalPage.vue"),
       },
     ],
     meta: {

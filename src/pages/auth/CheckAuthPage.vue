@@ -4,11 +4,10 @@ import { useCheckAuth } from "src/composables/useCheckAuth";
 import { onMounted } from "vue";
 
 const router = useRouter();
-
 onMounted(async () => {
   const status = await useCheckAuth();
   if (status === "authenticated") {
-    router.replace({ name: "Journal" });
+    router.replace({ name: "App" });
   } else {
     router.replace({ name: "Login" });
   }

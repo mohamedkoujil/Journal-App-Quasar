@@ -20,7 +20,7 @@ export default async ({ router }) => {
     }
 
     if (to.meta.requiresGuest && isAuth) {
-      return next({ name: "Journal" });
+      return next({ name: "App" });
     }
 
     next();

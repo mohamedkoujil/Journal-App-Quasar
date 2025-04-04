@@ -1,26 +1,17 @@
 <script setup>
-import { ref } from "vue";
+import { onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "stores/auth";
+import { useJournalStore } from "stores/journal";
 import EssentialLink from "components/EssentialLink.vue";
 import UserCard from "src/components/UserCard.vue";
+import { ref } from "vue";
 
-defineOptions({
-  name: "MainLayout",
-});
+const authStore = useAuthStore();
+const journalStore = useJournalStore();
+const router = useRouter();
 
 const leftDrawerOpen = ref(false);
-const authStore = useAuthStore();
-const router = useRouter();
-console.log(authStore.user);
-const linksList = [
-  {
-    title: "example",
-    caption: "example",
-    icon: "bookmark_border",
-    link: "https://quasar.dev",
-  },
-];
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -28,8 +19,27 @@ function toggleLeftDrawer() {
 
 const handleLogout = async () => {
   await authStore.logout();
+  journalStore.clearNotesLogout();
   router.push({ name: "Login" });
 };
+
+const handleActiveNote = (noteId) => {
+  router.push({ name: "Journal" });
+  journalStore.setActiveNote(noteId);
+};
+
+const handleNewNote = async () => {
+  await journalStore.startNewNote();
+  if (journalStore.active?.id) {
+    handleActiveNote(journalStore.active.id);
+  }
+};
+
+onMounted(async () => {
+  if (journalStore.notes.length === 0) {
+    await journalStore.startLoadingNotes();
+  }
+});
 </script>
 
 <template>
@@ -47,7 +57,6 @@ const handleLogout = async () => {
 
         <q-toolbar-title> Journal App </q-toolbar-title>
 
-        <!-- Logout Icon -->
         <q-btn
           flat
           dense
@@ -69,10 +78,22 @@ const handleLogout = async () => {
           class="q-mb-md"
         />
 
+        <q-item clickable v-ripple @click="handleNewNote">
+          <q-item-section avatar>
+            <q-icon name="note_add" />
+          </q-item-section>
+          <q-item-section>
+            <q-item-label>Nueva Nota</q-item-label>
+          </q-item-section>
+        </q-item>
+
         <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
+          v-for="note in journalStore.notes"
+          :key="note.id"
+          :title="note.title || 'Nota sin título'"
+          :caption="new Date(note.date).toLocaleDateString()"
+          @click="handleActiveNote(note)"
+          icon="description"
         />
       </q-list>
     </q-drawer>
@@ -82,7 +103,3 @@ const handleLogout = async () => {
     </q-page-container>
   </q-layout>
 </template>
-
-<style scoped>
-/* Add custom styles here if needed */
-</style>

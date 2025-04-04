@@ -18,6 +18,7 @@ const {
   formValidation,
   submitForm,
   formSubmitted,
+  clearValidations,
 } = useForm(
   {
     email: "",
@@ -46,9 +47,7 @@ const onSubmit = async () => {
   if (!isFormValid.value) return;
   isSubmitting.value = true;
 
-  const { email, password } = formState;
   const result = await authStore.registerUser({ ...formState });
-  console.log(result);
   if (result?.error) {
     errorMessage.value = result.error;
   } else {
@@ -67,6 +66,7 @@ const onSubmit = async () => {
 };
 
 const onGoogleSignIn = async () => {
+  clearValidations();
   submitForm();
 
   isSubmitting.value = true;
@@ -99,7 +99,7 @@ const goToLogin = () => {
           :error="formSubmitted && formValidation.displayNameValid !== null"
           :error-message="displayNameValid"
         />
-        <!-- TODO: Change to a file input -->
+        <!-- TODO Change to a file input -->
         <q-input
           filled
           v-model="formState.photoURL"
