@@ -1,17 +1,9 @@
-import { computed, reactive, ref, watch } from "vue";
+import { computed, reactive, ref, watch, watchEffect } from "vue";
 
 export const useForm = (initialForm = {}, formValidations = {}) => {
   const formState = reactive({ ...initialForm });
   const formValidation = reactive({});
   const formSubmitted = ref(false);
-
-  watch(
-    formState,
-    () => {
-      createValidators();
-    },
-    { deep: true }
-  );
 
   watch(
     () => ({ ...initialForm }),
@@ -25,7 +17,7 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
   });
 
   const onInputChange = (name, value) => {
-    console.log(value);
+    formSubmitted.value = false;
     formState[name] = value;
   };
 
@@ -46,6 +38,21 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     formSubmitted.value = true;
   };
 
+  watchEffect(() => {
+    createValidators();
+    console.log(formValidation);
+  });
+
+  watch(formState, () => {
+    formSubmitted.value = false;
+  });
+
+  const clearValidations = () => {
+    for (const field in formValidations) {
+      formValidation[`${field}Valid`] = null;
+    }
+  };
+
   return {
     ...formState,
     formState,
@@ -53,6 +60,9 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
     onResetForm,
     isFormValid,
     ...formValidation,
+    formValidation,
+    formSubmitted,
     submitForm,
+    clearValidations,
   };
 };

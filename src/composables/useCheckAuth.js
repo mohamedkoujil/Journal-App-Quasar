@@ -1,25 +1,22 @@
 import { onAuthStateChanged } from "firebase/auth";
-import { ref, onMounted } from "vue";
-import { useAuthStore } from "../stores/auth"; // Importa el store de autenticación
 import { FirebaseAuth } from "../firebase/config";
+import { useAuthStore } from "../stores/auth";
 
-export function useCheckAuth() {
+export const useCheckAuth = () => {
   const authStore = useAuthStore();
-  const status = ref(authStore.status);
 
-  onMounted(() => {
-    onAuthStateChanged(FirebaseAuth, async (user) => {
+  return new Promise((resolve) => {
+    onAuthStateChanged(FirebaseAuth, (user) => {
       if (!user) {
-        authStore.logout();
-        status.value = "unauthenticated";
+        authStore.status = "unauthenticated";
+        authStore.user = null;
+        resolve("unauthenticated");
       } else {
-        const { displayName, email, photoURL, uid } = user;
-        authStore.login({ displayName, email, photoURL, uid });
-        status.value = "authenticated";
-        authStore.startLoadingNotes(); // Carga notas si es necesario
+        const { uid, displayName, email, photoURL } = user;
+        authStore.status = "authenticated";
+        authStore.user = { uid, displayName, email, photoURL };
+        resolve("authenticated");
       }
     });
   });
-
-  return status;
-}
+};

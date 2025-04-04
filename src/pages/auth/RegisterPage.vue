@@ -1,25 +1,121 @@
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useForm } from "../../composables/useForm";
+import { useAuthStore } from "../../stores/auth";
+
+const router = useRouter();
+const authStore = useAuthStore();
+
+// Form handling
+const {
+  formState,
+  isFormValid,
+  displayNameValid,
+  photoURLValid,
+  emailValid,
+  passwordValid,
+  formValidation,
+  submitForm,
+  formSubmitted,
+} = useForm(
+  {
+    email: "",
+    displayName: "",
+    photoURL: "",
+    password: "",
+    confirmPassword: "",
+  },
+  {
+    displayName: [() => true, "displayName is required"],
+    photoURL: [() => true, "Photo URL is required"],
+    email: [
+      (val) => val.length > 0 && val.includes("@"),
+      "Please enter a valid email",
+    ],
+    password: [(val) => val.length > 0, "Password is required"],
+  }
+);
+
+const isSubmitting = ref(false);
+const errorMessage = ref("");
+
+const onSubmit = async () => {
+  submitForm();
+
+  if (!isFormValid.value) return;
+  isSubmitting.value = true;
+
+  const { email, password } = formState;
+  const result = await authStore.registerUser({ ...formState });
+  console.log(result);
+  if (result?.error) {
+    errorMessage.value = result.error;
+  } else {
+    const loginResult = await authStore.loginWithEmail({
+      email: formState.email,
+      password: formState.password,
+    });
+    if (loginResult?.error) {
+      errorMessage.value = loginResult.error;
+    } else {
+      router.push({ name: "Journal" });
+    }
+  }
+
+  isSubmitting.value = false;
+};
+
+const onGoogleSignIn = async () => {
+  submitForm();
+
+  isSubmitting.value = true;
+
+  const result = await authStore.loginWithGoogle();
+
+  if (result?.error) {
+    errorMessage.value = result.error;
+  } else {
+    router.push({ name: "Journal" });
+  }
+
+  isSubmitting.value = false;
+};
+
+const goToLogin = () => {
+  router.push({ name: "Login" });
+};
+</script>
+
 <template>
   <q-page class="flex flex-center">
-    <div class="q-pa-md" style="max-width: 400px">
-      <h3 class="text-center q-mb-md">Register</h3>
-      <q-form @submit="onSubmit" @reset="onReset" class="q-gutter-md">
+    <div class="q-pa-md auth-form" style="max-width: 400px">
+      <q-form @submit="onSubmit" class="q-gutter-md">
         <q-input
           filled
-          v-model="formState.name"
-          label="Full Name *"
-          hint="Enter your full name"
+          v-model="formState.displayName"
+          label="Display Name"
           lazy-rules
-          :error="nameValid !== null"
-          :error-message="nameValid"
+          :error="formSubmitted && formValidation.displayNameValid !== null"
+          :error-message="displayNameValid"
+        />
+        <!-- TODO: Change to a file input -->
+        <q-input
+          filled
+          v-model="formState.photoURL"
+          label="Photo URL"
+          lazy-rules
+          :error="formSubmitted && formValidation.photoURLValid !== null"
+          :error-message="photoURLValid"
         />
 
         <q-input
           filled
           v-model="formState.email"
           label="Email *"
-          hint="Enter your email address"
+          hint="example@example.com"
           lazy-rules
-          :error="emailValid !== null"
+          :error="formSubmitted && formValidation.emailValid !== null"
           :error-message="emailValid"
         />
 
@@ -28,9 +124,8 @@
           type="password"
           v-model="formState.password"
           label="Password *"
-          hint="Password must be at least 6 characters"
           lazy-rules
-          :error="passwordValid !== null"
+          :error="formSubmitted && formValidation.passwordValid !== null"
           :error-message="passwordValid"
         />
 
@@ -39,85 +134,61 @@
           type="password"
           v-model="formState.confirmPassword"
           label="Confirm Password *"
-          hint="Re-enter your password"
           lazy-rules
-          :error="confirmPasswordValid !== null"
-          :error-message="confirmPasswordValid"
+          :error="
+            formSubmitted && formState.password !== formState.confirmPassword
+          "
+          error-message="Passwords do not match"
         />
 
-        <div class="q-mt-md">
+        <div
+          class="q-mt-md"
+          style="display: flex; gap: 10px; justify-content: flex-end"
+        >
           <q-btn
             label="Register"
             type="submit"
             color="primary"
-            :disable="!isFormValid"
+            :disabled="isSubmitting"
           />
           <q-btn
-            label="Reset"
-            type="reset"
+            label="Google"
             color="secondary"
-            flat
-            class="q-ml-sm"
+            @click="onGoogleSignIn"
+            :loading="isSubmitting"
           />
+        </div>
+
+        <div
+          class="q-mt-md"
+          style="display: flex; gap: 10px; justify-content: flex-end"
+        >
+          <q-btn
+            flat
+            label="Already have an account? Login"
+            @click="goToLogin"
+          />
+        </div>
+
+        <div v-if="errorMessage" class="q-mt-md">
+          <q-banner color="negative" class="q-pa-none">
+            <span>{{ errorMessage }}</span>
+          </q-banner>
         </div>
       </q-form>
     </div>
   </q-page>
 </template>
 
-<script setup>
-import { useForm } from "@/composables/useForm";
-import { registerUserWithPassword } from "@/firebase/authMethods"; // Asegúrate de importar los métodos de Firebase
-
-defineOptions({
-  name: "RegisterPage",
-});
-
-const {
-  formState,
-  onInputChange,
-  onResetForm,
-  isFormValid,
-  nameValid,
-  emailValid,
-  passwordValid,
-  confirmPasswordValid,
-} = useForm(
-  { name: "", email: "", password: "", confirmPassword: "" },
-  {
-    name: [(val) => val.length > 0, "Please type your name"],
-    email: [(val) => /.+@.+\..+/.test(val), "Please enter a valid email"],
-    password: [
-      (val) => val.length >= 6,
-      "Password must be at least 6 characters long",
-    ],
-    confirmPassword: [
-      (val) => val === formState.password,
-      "Passwords do not match",
-    ],
-  }
-);
-
-const onSubmit = async () => {
-  if (!isFormValid.value) return;
-
-  const { name, email, password } = formState;
-
-  const { ok, errorMessage } = await registerUserWithPassword({
-    email,
-    password,
-    displayName: name,
-  });
-
-  if (ok) {
-    console.log("Registration successful!");
-    // Redirect to login or dashboard, for example
-  } else {
-    console.error("Registration failed:", errorMessage);
-  }
-};
-
-const onReset = () => {
-  onResetForm();
-};
-</script>
+<style scoped>
+.auth-form {
+  margin: auto;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  max-width: 400px;
+  width: 100%;
+}
+</style>

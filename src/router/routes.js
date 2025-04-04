@@ -1,23 +1,27 @@
-import { useCheckAuth } from "../composables/useCheckAuth";
-
 const routes = [
   {
     path: "/",
-    redirect: async () => {
-      const status = await useCheckAuth();
-      return status === "authenticated" ? "/journal" : "/auth/login";
-    },
+    component: () => import("src/pages/auth/CheckAuthPage.vue"),
   },
   {
     path: "/journal",
+    name: "Journal",
     component: () => import("layouts/MainLayout.vue"),
-    meta: { requiresAuth: true },
-    children: [{ path: "", component: () => import("pages/JournalPage.vue") }],
+    children: [
+      {
+        path: ":itemId?",
+        name: "JournalPage",
+        props: true,
+        component: () => import("pages/Journal/JournalPage.vue"),
+      },
+    ],
+    meta: {
+      requiresAuth: true,
+    },
   },
   {
     path: "/auth",
     component: () => import("layouts/AuthLayout.vue"),
-    meta: { requiresGuest: true },
     children: [
       {
         path: "login",
@@ -30,6 +34,9 @@ const routes = [
         component: () => import("pages/auth/RegisterPage.vue"),
       },
     ],
+    meta: {
+      requiresGuest: true,
+    },
   },
   {
     path: "/:catchAll(.*)*",

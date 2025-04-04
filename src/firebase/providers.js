@@ -17,7 +17,6 @@ export const signInWithGoogle = async () => {
     const { displayName, email, photoURL, uid } = result.user;
     return {
       ok: true,
-      //user Info
       displayName,
       email,
       photoURL,
@@ -38,18 +37,18 @@ export const registerUserWithPassword = async ({
   email,
   password,
   displayName,
+  photoURL,
 }) => {
   try {
     const resp = await createUserWithEmailAndPassword(
       FirebaseAuth,
       email,
-      password,
-      displayName
+      password
     );
-    const { uid, photoURL } = resp.user;
-    updateProfile(FirebaseAuth.currentUser, {
-      displayName,
-    });
+    const { uid } = resp.user;
+
+    await updateProfile(resp.user, { displayName, photoURL });
+
     return { ok: true, uid, photoURL, email, displayName };
   } catch (error) {
     return { ok: false, errorMessage: error.message };
@@ -64,13 +63,14 @@ export const loginWithEmailPassword = async ({ email, password }) => {
       password
     );
     const { uid, displayName, photoURL } = resp.user;
-    return { ok: true, uid, displayName, photoURL };
+    return { ok: true, uid, displayName, photoURL, email };
   } catch (error) {
     console.log(error);
     return { ok: false, errorMessage: error.message };
   }
 };
 
+// Logout function
 export const logoutFirebase = async () => {
   return await FirebaseAuth.signOut();
 };
