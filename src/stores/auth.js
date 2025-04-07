@@ -19,7 +19,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   const isAuthenticated = computed(() => status.value === "authenticated");
 
-  const loginUser = async ({ email, password }) => {
+  const loginWithEmail = async ({ email, password }) => {
     status.value = "checking";
     try {
       const { user: firebaseUser } = await signInWithEmailAndPassword(
@@ -107,7 +107,7 @@ export const useAuthStore = defineStore("auth", () => {
     status,
     errorMessage,
     isAuthenticated,
-    loginUser,
+    loginWithEmail,
     registerUser,
     uploadProfileImage,
     loginWithGoogle,

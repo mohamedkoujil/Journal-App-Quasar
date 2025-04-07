@@ -69,9 +69,9 @@ onMounted(async () => {
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list>
         <UserCard
-          :displayName="authStore.user.displayName"
-          :email="authStore.user.email"
-          :photoURL="authStore.user.photoURL"
+          :displayName="authStore?.user?.displayName"
+          :email="authStore?.user?.email"
+          :photoURL="authStore?.user?.photoURL"
           class="q-mb-md"
         />
 
