@@ -30,9 +30,6 @@ const handleActiveNote = (noteId) => {
 
 const handleNewNote = async () => {
   await journalStore.startNewNote();
-  if (journalStore.active?.id) {
-    handleActiveNote(journalStore.active.id);
-  }
 };
 
 onMounted(async () => {

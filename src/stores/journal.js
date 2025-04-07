@@ -44,16 +44,16 @@ export const useJournalStore = defineStore("journal", () => {
     messageSaved.value = "";
   };
 
-  const startSavingNote = async (title, body) => {
+  const startSavingNote = async () => {
     isSaving.value = true;
     const { user } = useAuthStore();
 
-    active.value.title = title;
-    active.value.body = body;
-
-    const noteToSave = active.value;
-    console.log(noteToSave);
+    const noteToSave = { ...active.value };
     delete noteToSave.id;
+
+    console.log(active.value);
+    console.log("asd");
+    console.log(noteToSave);
 
     const noteRef = doc(
       FirebaseDB,

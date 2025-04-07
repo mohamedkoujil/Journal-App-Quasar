@@ -6,18 +6,8 @@ import { Notify } from "quasar";
 import { useQuasar } from "quasar";
 
 const journalStore = useJournalStore();
+const { isSaving, active: note } = journalStore;
 const $q = useQuasar();
-
-const note = journalStore.active;
-
-const title = ref("");
-const body = ref("");
-const isSaving = ref(false);
-
-watch(note, (newNote) => {
-  title.value = newNote?.title || "";
-  body.value = newNote?.body || "";
-});
 
 const dateString = computed(() => {
   return note.value
@@ -26,9 +16,7 @@ const dateString = computed(() => {
 });
 
 const onSave = async () => {
-  isSaving.value = true;
-  await journalStore.startSavingNote(title.value, body.value);
-  isSaving.value = false;
+  await journalStore.startSavingNote();
   Notify.create({
     message: "Nota guardada con éxito",
     color: "positive",
@@ -94,14 +82,14 @@ const onUpload = (event) => {
 
     <q-input
       filled
-      v-model="title"
+      v-model="journalStore.active.title"
       label="Título"
       class="q-mb-md"
       :disable="isSaving"
     />
     <q-input
       filled
-      v-model="body"
+      v-model="journalStore.active.body"
       type="textarea"
       label="¿Qué pasó hoy?"
       autogrow
