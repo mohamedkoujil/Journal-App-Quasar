@@ -65,7 +65,7 @@ export const loginWithEmailPassword = async ({ email, password }) => {
     const { uid, displayName, photoURL } = resp.user;
     return { ok: true, uid, displayName, photoURL, email };
   } catch (error) {
-    console.log(error);
+    error;
     return { ok: false, errorMessage: error.message };
   }
 };

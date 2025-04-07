@@ -12,7 +12,6 @@ const {
   formState,
   isFormValid,
   displayNameValid,
-  photoURLValid,
   emailValid,
   passwordValid,
   formValidation,
@@ -23,13 +22,11 @@ const {
   {
     email: "",
     displayName: "",
-    photoURL: "",
     password: "",
     confirmPassword: "",
   },
   {
-    displayName: [() => true, "displayName is required"],
-    photoURL: [() => true, "Photo URL is required"],
+    displayName: [() => true, "Display name is required"],
     email: [
       (val) => val.length > 0 && val.includes("@"),
       "Please enter a valid email",
@@ -40,21 +37,35 @@ const {
 
 const isSubmitting = ref(false);
 const errorMessage = ref("");
+const selectedFile = ref(null);
 
 const onSubmit = async () => {
   submitForm();
 
-  if (!isFormValid.value) return;
+  if (!isFormValid.value || formState.password !== formState.confirmPassword)
+    return;
+
   isSubmitting.value = true;
 
-  const result = await authStore.registerUser({ ...formState });
+  const result = await authStore.registerUser({
+    email: formState.email,
+    password: formState.password,
+    name: formState.displayName,
+  });
+
   if (result?.error) {
     errorMessage.value = result.error;
   } else {
-    const loginResult = await authStore.loginWithEmail({
+    // Subir imagen si hay una seleccionada
+    if (selectedFile.value) {
+      await authStore.uploadProfileImage(selectedFile.value);
+    }
+
+    const loginResult = await authStore.loginUser({
       email: formState.email,
       password: formState.password,
     });
+
     if (loginResult?.error) {
       errorMessage.value = loginResult.error;
     } else {
@@ -99,15 +110,21 @@ const goToLogin = () => {
           :error="formSubmitted && formValidation.displayNameValid !== null"
           :error-message="displayNameValid"
         />
-        <!-- TODO Change to a file input -->
-        <q-input
+
+        <q-file
+          v-model="selectedFile"
+          label="Upload Profile Image"
+          accept="image/*"
           filled
-          v-model="formState.photoURL"
-          label="Photo URL"
-          lazy-rules
-          :error="formSubmitted && formValidation.photoURLValid !== null"
-          :error-message="photoURLValid"
-        />
+          clearable
+          standout
+          class="q-mb-md"
+          counter
+        >
+          <template #prepend>
+            <q-icon name="image" />
+          </template>
+        </q-file>
 
         <q-input
           filled
@@ -149,7 +166,7 @@ const goToLogin = () => {
             label="Register"
             type="submit"
             color="primary"
-            :disabled="isSubmitting"
+            :loading="isSubmitting"
           />
           <q-btn
             label="Google"

@@ -40,7 +40,7 @@ export const useForm = (initialForm = {}, formValidations = {}) => {
 
   watchEffect(() => {
     createValidators();
-    console.log(formValidation);
+    formValidation;
   });
 
   watch(formState, () => {

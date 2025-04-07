@@ -88,6 +88,7 @@ const onUpload = (event) => {
         <input
           type="file"
           multiple
+          accept="image/*"
           ref="fileInput"
           class="hidden"
           @change="onUpload"

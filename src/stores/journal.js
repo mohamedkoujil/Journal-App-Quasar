@@ -51,9 +51,9 @@ export const useJournalStore = defineStore("journal", () => {
     const noteToSave = { ...active.value };
     delete noteToSave.id;
 
-    console.log(active.value);
-    console.log("asd");
-    console.log(noteToSave);
+    active.value;
+    ("asd");
+    noteToSave;
 
     const noteRef = doc(
       FirebaseDB,
@@ -61,7 +61,6 @@ export const useJournalStore = defineStore("journal", () => {
     );
     await setDoc(noteRef, noteToSave, { merge: true });
 
-    // Update notes array
     startLoadingNotes();
 
     messageSaved.value = `${active.value.title} se ha guardado correctamente`;
@@ -71,7 +70,7 @@ export const useJournalStore = defineStore("journal", () => {
   const startUploadingFiles = async (files) => {
     try {
       isSaving.value = true;
-      console.log(files);
+      files;
       const uploadPromises = Array.from(files).map((file) => fileUpload(file));
       const imageUrls = await Promise.all(uploadPromises);
 
@@ -105,7 +104,7 @@ export const useJournalStore = defineStore("journal", () => {
   };
 
   const deleteImg = (img) => {
-    console.log(img);
+    img;
     if (active.value.imageUrls.length === 1) {
       active.value.imageUrls = [];
     } else {
