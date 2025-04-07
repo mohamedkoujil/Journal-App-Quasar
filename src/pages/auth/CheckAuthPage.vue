@@ -1,17 +1,18 @@
 <script setup>
-import { useRouter } from "vue-router";
-import { useCheckAuth } from "src/composables/useCheckAuth";
-import { onMounted } from "vue";
+// import { useRouter } from "vue-router";
+// import { useCheckAuth } from "src/composables/useCheckAuth";
+// import { onMounted } from "vue";
 
-const router = useRouter();
-onMounted(async () => {
-  const status = await useCheckAuth();
-  if (status === "authenticated") {
-    router.replace({ name: "App" });
-  } else {
-    router.replace({ name: "Login" });
-  }
-});
+// const router = useRouter();
+// onMounted(async () => {
+//   const status = await useCheckAuth();
+//   if (status === "authenticated") {
+//     router.replace({ name: "App" });
+//   } else {
+//     router.replace({ name: "Login" });
+//   }
+// });
+console.log("check auth page");
 </script>
 
 <template>

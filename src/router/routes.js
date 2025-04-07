@@ -6,6 +6,7 @@ const routes = [
   {
     path: "/app",
     name: "App",
+    redirect: "/app/journal",
     component: () => import("layouts/MainLayout.vue"),
     children: [
       {

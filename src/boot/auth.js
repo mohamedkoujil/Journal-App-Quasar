@@ -15,6 +15,10 @@ export default async ({ router }) => {
 
     const isAuth = authStore.status === "authenticated";
 
+    if (authStore.status == "checking") {
+      return next({ name: "CheckAuthPage" });
+    }
+
     if (to.meta.requiresAuth && !isAuth) {
       return next({ name: "Login" });
     }

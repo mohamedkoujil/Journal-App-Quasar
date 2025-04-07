@@ -68,13 +68,22 @@ export const useJournalStore = defineStore("journal", () => {
     isSaving.value = false;
   };
 
-  const startUploadingFiles = async (files = []) => {
-    isSaving.value = true;
-    const uploadPromises = files.map((file) => fileUpload(file));
-    const imageUrls = await Promise.all(uploadPromises);
+  const startUploadingFiles = async (files) => {
+    try {
+      isSaving.value = true;
+      console.log(files);
+      const uploadPromises = Array.from(files).map((file) => fileUpload(file));
+      const imageUrls = await Promise.all(uploadPromises);
 
-    active.value.imageUrls = [...(active.value.imageUrls || []), ...imageUrls];
-    isSaving.value = false;
+      active.value.imageUrls = [
+        ...(active.value.imageUrls || []),
+        ...imageUrls,
+      ];
+    } catch (error) {
+      console.error("Error uploading files:", error);
+    } finally {
+      isSaving.value = false;
+    }
   };
 
   const startDeletingNote = async () => {

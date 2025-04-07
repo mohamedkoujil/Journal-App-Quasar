@@ -4,17 +4,27 @@ import { useJournalStore } from "stores/journal";
 import { date } from "quasar";
 import { Notify } from "quasar";
 import { useQuasar } from "quasar";
+import ImageGallery from "src/components/ImageGallery.vue";
 
 const journalStore = useJournalStore();
 const { isSaving, active: note } = journalStore;
 const $q = useQuasar();
+const imageUrls = ref([]);
+watch(
+  () => journalStore.active?.imageUrls,
+  (newValue, oldValue) => {
+    if (newValue !== oldValue) {
+      imageUrls.value = newValue;
+    }
+  },
+  { immediate: true }
+);
 
 const dateString = computed(() => {
-  return note.value
-    ? date.formatDate(note.value.date, "dddd, DD MMMM YYYY")
-    : "";
+  if (!note) return "";
+  const dateObj = new Date(note.date);
+  return date.formatDate(dateObj, "DD-MM-YYYY");
 });
-
 const onSave = async () => {
   await journalStore.startSavingNote();
   Notify.create({
@@ -49,7 +59,7 @@ const onUpload = (event) => {
 <template>
   <q-page padding class="q-col-gutter-md" v-if="note">
     <div class="row items-center justify-between q-mb-md">
-      <div>
+      <div class="row items-center">
         <q-icon name="today" size="2rem" class="q-mr-sm" />
         <span class="text-h6">{{ dateString }}</span>
       </div>
@@ -106,16 +116,7 @@ const onUpload = (event) => {
       />
     </div>
 
-    <div v-if="note.imageUrls?.length" class="row q-col-gutter-md q-mt-md">
-      <q-img
-        v-for="(img, index) in note.imageUrls"
-        :key="index"
-        :src="img"
-        class="col-6 col-md-4 col-lg-3"
-        :ratio="4 / 3"
-        spinner-color="primary"
-      />
-    </div>
+    <ImageGallery v-if="imageUrls" :images="imageUrls" />
   </q-page>
 </template>
 
