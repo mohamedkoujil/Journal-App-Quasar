@@ -64,7 +64,7 @@ export const useJournalStore = defineStore("journal", () => {
     // Update notes array
     startLoadingNotes();
 
-    messageSaved.value = `${active.value.title} se ha actualizado correctamente`;
+    messageSaved.value = `${active.value.title} se ha guardado correctamente`;
     isSaving.value = false;
   };
 
@@ -104,6 +104,17 @@ export const useJournalStore = defineStore("journal", () => {
     messageSaved.value = "Nota eliminada correctamente";
   };
 
+  const deleteImg = (img) => {
+    console.log(img);
+    if (active.value.imageUrls.length === 1) {
+      active.value.imageUrls = [];
+    } else {
+      active.value.imageUrls = active.value.imageUrls.filter(
+        (image) => image !== img
+      );
+    }
+  };
+
   const clearNotesLogout = () => {
     isSaving.value = false;
     messageSaved.value = "";
@@ -125,5 +136,6 @@ export const useJournalStore = defineStore("journal", () => {
     startUploadingFiles,
     startDeletingNote,
     clearNotesLogout,
+    deleteImg,
   };
 });

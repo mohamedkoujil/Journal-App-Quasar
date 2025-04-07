@@ -28,7 +28,7 @@ const dateString = computed(() => {
 const onSave = async () => {
   await journalStore.startSavingNote();
   Notify.create({
-    message: "Nota guardada con éxito",
+    message: journalStore.messageSaved,
     color: "positive",
   });
 };
@@ -44,7 +44,19 @@ const onDelete = () => {
       color: "negative",
     },
   }).onOk(async () => {
-    await journalStore.startDeletingNote();
+    try {
+      await journalStore.startDeletingNote();
+      Notify.create({
+        message: journalStore.messageSaved,
+        color: "blue-10",
+      });
+    } catch (error) {
+      Notify.create({
+        message: "Error al borrar la nota",
+        color: "negative",
+      });
+      return;
+    }
   });
 };
 
@@ -116,7 +128,11 @@ const onUpload = (event) => {
       />
     </div>
 
-    <ImageGallery v-if="imageUrls" :images="imageUrls" />
+    <ImageGallery
+      v-if="imageUrls"
+      :images="imageUrls"
+      @delete-image="journalStore.deleteImg"
+    />
   </q-page>
 </template>
 

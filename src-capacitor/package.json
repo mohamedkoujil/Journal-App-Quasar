@@ -1,7 +1,7 @@
 {
-  "name": "quasar-project",
+  "name": "journal-app-quasar",
   "version": "0.0.1",
-  "description": "A Quasar Project",
+  "description": "Journal App with Quasar",
   "author": "Mohamed Koujil <mohamed.koujil.7e7@itb.cat>",
   "private": true,
   "dependencies": {
