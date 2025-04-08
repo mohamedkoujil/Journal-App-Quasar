@@ -46,32 +46,17 @@ const onSubmit = async () => {
     return;
 
   isSubmitting.value = true;
-
   const result = await authStore.registerUser({
     email: formState.email,
     password: formState.password,
     name: formState.displayName,
+    img: selectedFile.value,
   });
-
   if (result?.error) {
     errorMessage.value = result.error;
   } else {
-    if (selectedFile.value) {
-      await authStore.uploadProfileImage(selectedFile.value);
-    }
-
-    const loginResult = await authStore.loginWithEmail({
-      email: formState.email,
-      password: formState.password,
-    });
-
-    if (loginResult?.error) {
-      errorMessage.value = loginResult.error;
-    } else {
-      router.push({ name: "Journal" });
-    }
+    router.push({ name: "Journal" });
   }
-
   isSubmitting.value = false;
 };
 

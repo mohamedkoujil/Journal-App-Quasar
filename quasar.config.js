@@ -81,6 +81,12 @@ module.exports = configure(function (/* ctx */) {
           // { server: false },
         ],
       ],
+      //allow @ imports
+      resolve: {
+        alias: {
+          "@": "/src",
+        },
+      },
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#devServer

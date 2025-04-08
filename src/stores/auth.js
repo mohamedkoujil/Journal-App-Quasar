@@ -41,7 +41,7 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
-  const registerUser = async ({ name, email, password }) => {
+  const registerUser = async ({ name, email, password, img = null }) => {
     status.value = "checking";
     try {
       const { user: firebaseUser } = await createUserWithEmailAndPassword(
@@ -50,36 +50,32 @@ export const useAuthStore = defineStore("auth", () => {
         password
       );
 
+      let imgUrl = null;
+      if (img) {
+        try {
+          imgUrl = await fileUpload(img);
+        } catch (error) {
+          errorMessage.value = "Error uploading image: " + error.message;
+          console.error("Error uploading image:", error);
+          throw new Error("Error uploading image");
+        }
+      }
       await updateProfile(firebaseUser, {
         displayName: name,
-        photoURL: null,
+        photoURL: imgUrl,
       });
 
       user.value = {
         uid: firebaseUser.uid,
         email: firebaseUser.email,
-        displayName: name,
-        photoURL: null,
+        displayName: firebaseUser.displayName,
+        photoURL: firebaseUser.photoURL,
       };
       status.value = "authenticated";
       errorMessage.value = "";
     } catch (error) {
-      status.value = "not-authenticated";
+      status.value = "unauthenticated";
       errorMessage.value = error.message;
-    }
-  };
-
-  const uploadProfileImage = async (file) => {
-    try {
-      const imageUrl = await fileUpload(file);
-      await updateProfile(FirebaseAuth.currentUser, {
-        photoURL: imageUrl,
-      });
-
-      user.value.photoURL = imageUrl;
-    } catch (error) {
-      console.error("Error uploading profile image", error);
-      errorMessage.value = "No se pudo subir la imagen de perfil";
     }
   };
 
@@ -109,7 +105,6 @@ export const useAuthStore = defineStore("auth", () => {
     isAuthenticated,
     loginWithEmail,
     registerUser,
-    uploadProfileImage,
     loginWithGoogle,
     logout,
   };
