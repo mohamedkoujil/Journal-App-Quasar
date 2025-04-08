@@ -56,12 +56,11 @@ const onSubmit = async () => {
   if (result?.error) {
     errorMessage.value = result.error;
   } else {
-    // Subir imagen si hay una seleccionada
     if (selectedFile.value) {
       await authStore.uploadProfileImage(selectedFile.value);
     }
 
-    const loginResult = await authStore.loginUser({
+    const loginResult = await authStore.loginWithEmail({
       email: formState.email,
       password: formState.password,
     });

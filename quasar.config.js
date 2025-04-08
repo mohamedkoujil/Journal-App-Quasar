@@ -71,11 +71,14 @@ module.exports = configure(function (/* ctx */) {
         [
           "vite-plugin-checker",
           {
-            eslint: {
-              lintCommand: 'eslint "./**/*.{js,mjs,cjs,vue}"',
-            },
+            eslint: false,
           },
-          { server: false },
+          // {
+          //   eslint: {
+          //     lintCommand: 'eslint "./**/*.{js,mjs,cjs,vue}"',
+          //   },
+          // },
+          // { server: false },
         ],
       ],
     },

@@ -18,14 +18,14 @@ const props = defineProps({
 });
 
 // Imagen por defecto
-const defaultPhoto =
+const defaultPfp =
   "https://img.freepik.com/free-vector/blue-circle-with-white-user_78370-4707.jpg?t=st=1743788189~exp=1743791789~hmac=f73890cca01d7c06e339adb28a8009613866c0161b10f49164be32629add42d8&w=740";
 </script>
 
 <template>
   <div class="user-card">
     <img
-      :src="photoURL || defaultPhoto"
+      :src="photoURL || defaultPfp"
       :alt="displayName"
       class="user-card__photo"
     />
